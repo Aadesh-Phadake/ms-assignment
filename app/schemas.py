@@ -145,8 +145,19 @@ class OrderItemIn(BaseModel):
 
 class OrderCreate(BaseModel):
     member_id: int
-    # TODO: reject an empty items list and the same book_id appearing twice (both 422)
     items: List[OrderItemIn]
+
+    @field_validator("items")
+    @classmethod
+    def validate_items(cls, items: List[OrderItemIn]) -> List[OrderItemIn]:
+        if not items:
+            raise ValueError("items list cannot be empty")
+        seen_books = set()
+        for item in items:
+            if item.book_id in seen_books:
+                raise ValueError(f"duplicate book_id: {item.book_id}")
+            seen_books.add(item.book_id)
+        return items
 
 
 class OrderItemOut(BaseModel):
