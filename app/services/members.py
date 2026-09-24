@@ -73,4 +73,31 @@ def get_member_stats(db: Session, member_id: int, now: datetime) -> MemberStats:
     - overdue_loans counts unreturned loans with now > due_at.
     - late_fees_cents sums late fees of returned loans.
     """
-    raise NotImplementedError("get_member_stats")
+    member = get_member(db, member_id)
+
+    orders_paid = 0
+    total_spent_cents = 0
+    for order in member.orders:
+        if order.status == "paid":
+            orders_paid += 1
+            total_spent_cents += order.total_cents
+
+    active_loans = 0
+    overdue_loans = 0
+    late_fees_cents = 0
+    for loan in member.loans:
+        if loan.returned_at is None:
+            active_loans += 1
+            if now > loan.due_at:
+                overdue_loans += 1
+        else:
+            late_fees_cents += loan.late_fee_cents
+
+    return MemberStats(
+        member_id=member.id,
+        orders_paid=orders_paid,
+        total_spent_cents=total_spent_cents,
+        active_loans=active_loans,
+        overdue_loans=overdue_loans,
+        late_fees_cents=late_fees_cents,
+    )
