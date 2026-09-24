@@ -1,6 +1,6 @@
 # Sanctum Sanctorum - Submission Notes
 
-**Live URL:** [YOUR_RENDER_URL_HERE]
+**Live URL:** https://sanctum-sanctorum-7v4e.onrender.com/
 
 ### Demo Accounts
 The database automatically seeds on first start. You can test the endpoints using these seeded members:
@@ -11,7 +11,7 @@ The database automatically seeds on first start. You can test the endpoints usin
 ---
 
 ## 1. What was finished
-I completed the full 5-day specification. All 202 tests pass, and the application is successfully deployed using Render and Supabase (PostgreSQL).
+I completed the full specification. All 202 tests pass, and the application is successfully deployed using Render and Supabase (PostgreSQL).
 
 - **Books:** Creation, listing (with advanced search, pagination, and sorting), partial updates, and ISBN-13 checksum validation.
 - **Members:** Registration with exact duplicate email checks.
