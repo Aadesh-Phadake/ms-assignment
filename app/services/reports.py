@@ -1,11 +1,15 @@
 """Reporting queries."""
 from typing import List
+import logging
 
 from sqlalchemy import select, func, desc, asc
 from sqlalchemy.orm import Session
 
 from app.models import Book, Order, OrderItem, OrderStatus
 from app.schemas import TopBook
+from app.cache import get_cache, set_cache
+
+logger = logging.getLogger(__name__)
 
 
 def top_books(db: Session, limit: int = 5) -> List[TopBook]:
@@ -14,6 +18,16 @@ def top_books(db: Session, limit: int = 5) -> List[TopBook]:
     Rules: copies_sold sums quantities over ``paid`` orders only; books with no sales are
     excluded; sorted by copies_sold desc, then title asc; at most ``limit`` rows.
     """
+    cache_key = f"top_books:{limit}"
+    
+    # 1. Try to get from cache
+    cached_data = get_cache(cache_key)
+    if cached_data:
+        logger.info(f"Cache HIT for {cache_key}")
+        return [TopBook(**item) for item in cached_data]
+        
+    logger.info(f"Cache MISS for {cache_key}")
+
     query = (
         select(
             Book.id.label("book_id"),
@@ -29,4 +43,9 @@ def top_books(db: Session, limit: int = 5) -> List[TopBook]:
     )
 
     rows = db.execute(query).all()
-    return [TopBook(book_id=r.book_id, title=r.title, copies_sold=r.copies_sold) for r in rows]
+    results = [TopBook(book_id=r.book_id, title=r.title, copies_sold=r.copies_sold) for r in rows]
+    
+    # 2. Save to cache for 5 minutes (300 seconds)
+    set_cache(cache_key, [r.model_dump() for r in results], ttl_seconds=300)
+    
+    return results

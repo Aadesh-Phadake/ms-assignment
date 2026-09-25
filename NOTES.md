@@ -36,6 +36,11 @@ The app was initially built for SQLite. When deploying to a serverless platform 
 **4. Complex Pricing Logic**
 I isolated the `calculate_discount_percent` logic into a pure function in `orders.py`. By keeping it decoupled from the database session, it is trivially easy to unit test every combination of tier and bulk discounts without needing database fixtures.
 
+**5. Redis Caching for Heavy Reports (Add-on)**
+The `top_books` report executes a heavy analytical query involving multiple joins and aggregations across `Books`, `Orders`, and `OrderItems`. To ensure the API remains extremely fast under load, I implemented a robust caching layer using Redis (`cache.py`). 
+- **Graceful Degradation:** The cache safely falls back to direct database execution if the `REDIS_URL` is missing or the Redis server is unreachable, ensuring no test breaks.
+- **Event-Driven Invalidation:** The cache is aggressively invalidated matching the `top_books:*` pattern exactly when `pay_order` is executed, guaranteeing that analytical users never see stale sales data while completely avoiding cache reads during write-heavy traffic.
+
 ---
 
 ## 3. AI Usage

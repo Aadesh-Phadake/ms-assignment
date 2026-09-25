@@ -107,6 +107,11 @@ def pay_order(db: Session, order_id: int) -> Order:
     order.status = OrderStatus.PAID.value
     db.commit()
     db.refresh(order)
+    
+    # Invalidate top books cache since sales have changed
+    from app.cache import invalidate_cache
+    invalidate_cache("top_books:*")
+    
     return order
 
 
