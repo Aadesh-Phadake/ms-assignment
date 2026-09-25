@@ -51,6 +51,16 @@ I containerized the entire stack using a multi-stage `Dockerfile` and `docker-co
 
 ---
 
+**7. GitHub Actions CI/CD (Add-on)**
+I added a continuous integration pipeline (`.github/workflows/ci.yml`) that runs automatically on every push and pull request to `main`. The pipeline:
+- Installs dependencies using `uv` for reproducible builds.
+- Runs the full 202-test suite with `pytest`.
+- Boots the app and hits the `/health` endpoint to verify the server starts cleanly.
+
+This ensures no broken code ever reaches the main branch.
+
+---
+
 ## 3. AI Usage
 
 I utilized an AI assistant (Google DeepMind's Gemini) during this project as a pair programmer to move quickly and effectively.
