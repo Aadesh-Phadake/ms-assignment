@@ -43,6 +43,14 @@ The `top_books` report executes a heavy analytical query involving multiple join
 
 ---
 
+**6. Dockerization (Add-on)**
+I containerized the entire stack using a multi-stage `Dockerfile` and `docker-compose.yml`. The Docker setup provisions three services: the FastAPI app, PostgreSQL 16, and Redis 7. Key design choices:
+- **Multi-stage build:** The first stage uses `uv` for fast dependency resolution; the second stage copies only the virtual environment and app code into a slim Python image, keeping the final image size minimal.
+- **Health checks & dependency ordering:** PostgreSQL and Redis containers include health checks, and the app container waits for both to be healthy before starting, preventing startup race conditions.
+- **One command to run everything:** `docker compose up --build` spins up the entire production-like environment locally.
+
+---
+
 ## 3. AI Usage
 
 I utilized an AI assistant (Google DeepMind's Gemini) during this project as a pair programmer to move quickly and effectively.

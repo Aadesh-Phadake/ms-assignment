@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+sanctum.db
+.git/
+.gitignore
+.env
+*.md
+tests/
+Makefile
+.pytest_cache/
